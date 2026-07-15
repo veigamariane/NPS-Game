@@ -89,7 +89,7 @@
       background: #fbfdfc; color: var(--ink); padding: 0 14px; outline: none; transition: .2s ease;
     }
     .field input:focus, .field select:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(0, 153, 93, .10); }
-    .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; margin: 9px 0 18px; }
+    .avatar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 9px; margin: 9px 0 18px; }
     .avatar-option { position: relative; }
     .avatar-option input { position: absolute; opacity: 0; pointer-events: none; }
     .avatar-option label {
@@ -212,6 +212,22 @@
     .character.hair-bob .hair::after { content: ""; position: absolute; width: 42px; height: 20px; left: 8px; top: 0; border-radius: 55% 55% 30% 30%; background: var(--hair); z-index: 9; }
     .character.hair-curly .hair { width: 60px; height: 43px; left: 7px; top: 0; background: transparent; }
     .character.hair-curly .hair::before, .character.hair-curly .hair::after { content: ""; position: absolute; width: 18px; height: 18px; border-radius: 50%; background: var(--hair); box-shadow: 14px -5px var(--hair), 28px -2px var(--hair), 41px 5px var(--hair), 4px 12px var(--hair), 20px 10px var(--hair), 35px 13px var(--hair); }
+    /* Cabelo cacheado longo, usado pela primeira personagem */
+    .character.hair-curly-long .hair { width: 64px; height: 91px; left: 5px; top: -1px; background: transparent; z-index: 5; }
+    .character.hair-curly-long .hair::before {
+      content: ""; position: absolute; width: 19px; height: 19px; border-radius: 50%; background: var(--hair);
+      box-shadow:
+        14px -5px var(--hair), 29px -3px var(--hair), 43px 3px var(--hair),
+        2px 13px var(--hair), 17px 10px var(--hair), 33px 11px var(--hair), 47px 16px var(--hair),
+        0 30px var(--hair), 46px 33px var(--hair),
+        1px 48px var(--hair), 44px 51px var(--hair),
+        4px 65px var(--hair), 40px 67px var(--hair);
+    }
+    .character.hair-curly-long .hair::after {
+      content: ""; position: absolute; left: 13px; top: 2px; width: 40px; height: 21px;
+      border-radius: 55% 55% 32% 32%; background: var(--hair);
+    }
+    .character.hair-curly-long .head { z-index: 7; }
     .character .brow { position: absolute; top: 20px; width: 9px; height: 2px; border-radius: 4px; background: #684536; z-index: 10; }
     .character .brow.left { left: 10px; transform: rotate(-4deg); } .character .brow.right { right: 10px; transform: rotate(4deg); }
     .character .eye { position: absolute; top: 25px; width: 5px; height: 6px; border-radius: 50%; background: #273932; z-index: 10; }
@@ -234,9 +250,15 @@
     .character .leg.left { left: 18px; } .character .leg.right { right: 18px; }
     .character .shoe { position: absolute; width: 23px; height: 9px; top: 140px; border-radius: 8px 8px 4px 4px; background: #243834; z-index: 2; }
     .character .shoe.left { left: 14px; } .character .shoe.right { right: 13px; }
-    .character.react-good { animation: celebrate .6s ease; }
-    .character.react-good .arm.left { transform: rotate(155deg); }
-    .character.react-good .arm.right { transform: rotate(-155deg); }
+    .character.react-good { animation: celebrate .68s ease; }
+    /* Braços, mangas e mãos sobem juntos na comemoração */
+    .character.react-good .arm.left { transform: translate(7px, -2px) rotate(155deg); }
+    .character.react-good .arm.right { transform: translate(-7px, -2px) rotate(-155deg); }
+    .character.react-good .sleeve { transform-origin: top center; }
+    .character.react-good .sleeve.left { transform: translate(6px, -1px) rotate(148deg); }
+    .character.react-good .sleeve.right { transform: translate(-6px, -1px) rotate(-148deg); }
+    .character.react-good .hand.left { top: 17px; left: -16px; transform: rotate(-18deg); }
+    .character.react-good .hand.right { top: 17px; right: -17px; transform: rotate(18deg); }
     @keyframes celebrate { 0%,100% { transform: translateY(0) rotate(0); } 40% { transform: translateY(-11px) rotate(-3deg); } 70% { transform: translateY(-4px) rotate(3deg); } }
     .character.react-bad { animation: reactBad .45s ease; }
     .character.react-bad .mouth { border-bottom: 0; border-top: 2px solid #8f3d46; border-radius: 12px 12px 0 0; top: 43px; }
@@ -425,7 +447,7 @@
     }
     .walk-tip.near { background: var(--orange); }
     @keyframes tipPulse { 50% { transform: translateX(-50%) translateY(-3px); } }
-    .decision-panel.walk-mode { max-height: none; overflow: hidden; padding-top: 10px; }
+    .decision-panel.walk-mode { display: none; }
     .decision-panel.walk-mode .panel-kicker { margin-bottom: 0; }
     .decision-panel.walk-mode .options,
     .decision-panel.walk-mode .panel-actions { display: none; }
@@ -444,6 +466,108 @@
       .walk-tip { bottom: 69px; }
       .move-btn { width: 58px; height: 52px; border-radius: 16px; }
     }
+
+
+    /* Ajustes mobile e identidade própria de cada sala */
+    html, body { overscroll-behavior: none; }
+    .field input { user-select: text; -webkit-user-select: text; touch-action: manipulation; }
+
+    .room-wall { transition: background .45s ease; }
+    .room-floor { transition: background .45s ease; }
+    .scene[data-room="reception"] .room-wall { background: linear-gradient(135deg, #edf8f2 0 72%, #dcefe6 72%); }
+    .scene[data-room="reception"] .room-floor { background: repeating-linear-gradient(90deg, #e6eee9 0 76px, #d6e4de 77px 79px); }
+    .scene[data-room="waiting"] .room-wall { background: linear-gradient(180deg, #eaf7f6, #d8efed); }
+    .scene[data-room="waiting"] .room-floor { background: repeating-linear-gradient(135deg, #edf3f1 0 34px, #dfeae6 35px 68px); }
+    .scene[data-room="care"] .room-wall { background: linear-gradient(90deg, #eff9f3 0 62%, #d9efe2 62%); }
+    .scene[data-room="care"] .room-floor { background: linear-gradient(160deg, #f5f8f6, #cddfd7); }
+    .scene[data-room="indicators"] .room-wall { background: radial-gradient(circle at 25% 18%, rgba(82,126,179,.16), transparent 25%), linear-gradient(150deg, #eef3fb, #dce8f6); }
+    .scene[data-room="indicators"] .room-floor { background: repeating-linear-gradient(90deg, #dce5ef 0 82px, #cdd9e6 83px 85px); }
+    .scene[data-room="management"] .room-wall { background: linear-gradient(160deg, #edf4f1 0 58%, #d1e3dd 58%); }
+    .scene[data-room="management"] .room-floor { background: linear-gradient(150deg, #dfebe7, #bccfc8); }
+    .scene[data-room="communication"] .room-wall { background: radial-gradient(circle at 82% 16%, rgba(237,114,3,.13), transparent 23%), linear-gradient(150deg, #fff2e9, #f1ddd2); }
+    .scene[data-room="communication"] .room-floor { background: repeating-linear-gradient(135deg, #f6e8df 0 42px, #ead6cb 43px 84px); }
+    .scene[data-room="relationship"] .room-wall { background: linear-gradient(140deg, #fff5e8, #f7dfc6); }
+    .scene[data-room="relationship"] .room-floor { background: linear-gradient(155deg, #f1e6d8, #d9c6b4); }
+    .scene[data-room="ideas"] .room-wall { background: radial-gradient(circle at 17% 17%, rgba(127,108,198,.18), transparent 25%), linear-gradient(145deg, #f4f0fb, #ded8ef); }
+    .scene[data-room="ideas"] .room-floor { background: repeating-linear-gradient(90deg, #e9e4f2 0 70px, #d8d0e6 71px 73px); }
+    .scene[data-room="arena"] .room-wall { background: radial-gradient(circle at 50% 3%, rgba(255,210,100,.44), transparent 31%), linear-gradient(145deg, #fff6df, #ead8aa); }
+    .scene[data-room="arena"] .room-floor { background: linear-gradient(155deg, #eadab8, #c9ae78); }
+
+    .wall-sign { position:absolute; top:54px; left:18px; padding:8px 12px; border-radius:9px; background:#fff; box-shadow:0 8px 18px rgba(0,75,68,.12); color:var(--green-dark); font:800 11px/1 "Manrope",sans-serif; letter-spacing:.08em; }
+    .reception-counter { position:absolute; right:10px; bottom:27%; width:145px; height:50px; border-radius:13px 13px 4px 4px; background:linear-gradient(180deg,#fff,#e8f1ed); box-shadow:0 10px 20px rgba(0,75,68,.14); border-top:8px solid var(--green); }
+    .reception-counter::after { content:""; position:absolute; left:22px; right:22px; bottom:-25px; height:25px; border-left:10px solid #76928a; border-right:10px solid #76928a; }
+    .queue-display { position:absolute; top:55px; right:25px; width:78px; height:42px; border-radius:8px; display:grid; place-items:center; background:#143c3a; color:#b8f5ce; box-shadow:0 8px 18px rgba(0,0,0,.17); font:800 12px/1 "Manrope",sans-serif; }
+
+    .chair-row { position:absolute; left:15px; right:15px; bottom:26%; display:flex; gap:8px; justify-content:flex-end; }
+    .chair-row i { width:44px; height:35px; border-radius:12px 12px 5px 5px; background:#fff; box-shadow:0 7px 14px rgba(0,75,68,.11); border-bottom:6px solid #78a59b; }
+    .magazine-rack { position:absolute; left:18px; top:77px; width:50px; height:58px; border-radius:7px; background:#fff; box-shadow:0 8px 16px rgba(0,75,68,.10); }
+    .magazine-rack::before { content:""; position:absolute; inset:10px; background:linear-gradient(90deg,#ed7203 0 45%,transparent 45% 55%,#00995d 55%); transform:skewY(-6deg); }
+
+    .care-cabinet { position:absolute; right:12px; top:48px; width:118px; height:90px; border-radius:9px; background:repeating-linear-gradient(90deg,#fff 0 55px,#d8e8e1 56px 59px); box-shadow:0 8px 18px rgba(0,75,68,.12); }
+    .care-cabinet::after { content:"+"; position:absolute; left:45px; top:20px; color:var(--green); font:800 37px/1 "Manrope",sans-serif; }
+    .iv-stand { position:absolute; left:23px; bottom:24%; width:5px; height:105px; border-radius:5px; background:#7c928d; }
+    .iv-stand::before { content:""; position:absolute; width:46px; height:4px; left:-20px; top:0; border-radius:4px; background:#7c928d; }
+    .iv-stand::after { content:""; position:absolute; width:22px; height:34px; left:8px; top:8px; border-radius:5px 5px 9px 9px; background:rgba(184,231,210,.85); border:2px solid #fff; }
+
+    .dashboard-wall { position:absolute; top:46px; left:16px; right:16px; height:92px; border-radius:13px; background:#173d49; box-shadow:0 11px 22px rgba(24,57,70,.24); border:6px solid #fff; overflow:hidden; }
+    .dashboard-wall i { position:absolute; bottom:13px; width:18px; border-radius:5px 5px 0 0; background:#67c191; }
+    .dashboard-wall i:nth-child(1){left:18px;height:28px}.dashboard-wall i:nth-child(2){left:48px;height:47px;background:#b8cc32}.dashboard-wall i:nth-child(3){left:78px;height:37px;background:#ed7203}.dashboard-wall i:nth-child(4){left:108px;height:57px;background:#67a6d9}
+    .dashboard-wall::after { content:"NPS  89"; position:absolute; right:16px; top:16px; color:#eafff7; font:800 15px/1 "Manrope",sans-serif; }
+
+    .meeting-table { position:absolute; left:50%; bottom:24%; transform:translateX(-50%); width:176px; height:45px; border-radius:50%; background:#fff; box-shadow:0 11px 19px rgba(0,75,68,.14); border-bottom:8px solid #97ada6; }
+    .meeting-table::before,.meeting-table::after { content:""; position:absolute; width:28px; height:35px; top:-20px; border-radius:10px; background:#5b8278; }
+    .meeting-table::before{left:13px}.meeting-table::after{right:13px}
+    .strategy-board { position:absolute; top:49px; right:17px; width:125px; height:78px; border-radius:9px; background:#fff; box-shadow:0 8px 17px rgba(0,75,68,.12); }
+    .strategy-board::before { content:"META  •  AÇÃO  •  PRAZO"; position:absolute; inset:15px 10px; color:#42635b; font:800 8px/2 "Manrope",sans-serif; border-bottom:5px solid #b8cc32; }
+
+    .campaign-board { position:absolute; top:47px; left:17px; width:138px; height:92px; border-radius:12px; background:#fff; box-shadow:0 9px 18px rgba(88,45,17,.13); transform:rotate(-2deg); }
+    .campaign-board::before { content:"VOZ DO CLIENTE"; position:absolute; top:16px; left:15px; color:#b65319; font:800 12px/1 "Manrope",sans-serif; }
+    .campaign-board::after { content:""; position:absolute; left:16px; right:16px; bottom:18px; height:7px; border-radius:9px; background:#00995d; box-shadow:0 -16px #f2b84b; }
+    .megaphone { position:absolute; right:21px; top:78px; width:54px; height:34px; background:var(--orange); clip-path:polygon(0 28%,70% 0,70% 100%,0 72%); filter:drop-shadow(0 7px 5px rgba(120,53,6,.17)); }
+    .megaphone::after { content:""; position:absolute; left:7px; bottom:-19px; width:12px; height:24px; border-radius:5px; background:#7c4930; transform:rotate(-18deg); }
+
+    .service-counter { position:absolute; left:15px; bottom:25%; width:136px; height:48px; border-radius:12px 12px 4px 4px; background:#fff; box-shadow:0 9px 18px rgba(100,67,26,.13); border-top:7px solid #ed7203; }
+    .rating-kiosk { position:absolute; right:20px; top:58px; width:75px; height:86px; border-radius:10px; background:#fff; box-shadow:0 8px 17px rgba(100,67,26,.13); }
+    .rating-kiosk::before { content:"☺"; position:absolute; top:10px; left:22px; font-size:34px; color:var(--green); }
+    .rating-kiosk::after { content:"1  2  3  4  5"; position:absolute; bottom:14px; left:9px; color:#8c6a46; font:800 7px/1 "Manrope",sans-serif; }
+
+    .sticky-wall { position:absolute; top:45px; left:16px; right:16px; height:98px; border-radius:12px; background:#fff; box-shadow:0 9px 19px rgba(73,55,125,.15); }
+    .sticky-wall i { position:absolute; width:34px; height:31px; border-radius:3px; box-shadow:0 5px 8px rgba(0,0,0,.08); }
+    .sticky-wall i:nth-child(1){left:16px;top:17px;background:#f8dc72;transform:rotate(-5deg)}.sticky-wall i:nth-child(2){left:61px;top:37px;background:#9dd7bd;transform:rotate(4deg)}.sticky-wall i:nth-child(3){right:19px;top:15px;background:#d6b7ed;transform:rotate(7deg)}.sticky-wall i:nth-child(4){right:66px;top:56px;background:#f3ad8a;transform:rotate(-3deg)}
+    .idea-bulb { position:absolute; right:26px; bottom:29%; font-size:48px; filter:drop-shadow(0 8px 5px rgba(90,65,10,.18)); }
+
+    .podium { position:absolute; left:50%; bottom:23%; transform:translateX(-50%); width:132px; height:52px; border-radius:11px 11px 4px 4px; background:linear-gradient(180deg,#fff1b4,#d9af42); box-shadow:0 11px 20px rgba(112,77,8,.20); }
+    .podium::before { content:"NPS"; position:absolute; inset:0; display:grid; place-items:center; color:#765008; font:800 18px/1 "Manrope",sans-serif; }
+    .spotlight { position:absolute; top:-16px; width:120px; height:230px; opacity:.30; background:linear-gradient(180deg,rgba(255,255,255,.95),transparent); clip-path:polygon(40% 0,60% 0,100% 100%,0 100%); }
+    .spotlight.left{left:6px;transform:rotate(10deg)}.spotlight.right{right:6px;transform:rotate(-10deg)}
+    .confetti { position:absolute; inset:36px 12px auto; height:95px; background-image:radial-gradient(circle,#ed7203 0 3px,transparent 4px),radial-gradient(circle,#00995d 0 3px,transparent 4px),radial-gradient(circle,#b8cc32 0 3px,transparent 4px); background-size:43px 41px,57px 47px,68px 53px; background-position:3px 1px,20px 9px,34px 4px; opacity:.65; }
+
+    /* Balão acima dos personagens, sem cobrir os rostos */
+    .bubble-wrap { top: 47px; align-items: flex-start; }
+    .speech-bubble { position: relative; width: min(88%, 460px); max-height: clamp(112px, 19svh, 150px); }
+    .speech-bubble::after { content:""; position:absolute; right:21px; bottom:-12px; width:22px; height:22px; background:rgba(255,255,255,.96); clip-path:polygon(0 0,100% 0,100% 100%); }
+    .player-speaking .speech-bubble::after { right:auto; left:21px; transform:scaleX(-1); }
+    .scene.dialogue-active .character-slot { bottom: 3%; }
+    .scene.dialogue-active .room-title-chip { opacity: 0; transform: translateY(-8px); pointer-events:none; }
+    .room-title-chip { transition: opacity .2s ease, transform .2s ease; }
+
+    /* Controles maiores e mais estáveis no toque contínuo */
+    .movement-controls { bottom: calc(12px + var(--safe-bottom)); padding: 0 12px; }
+    .move-btn { width: 78px; height: 66px; border-radius: 22px; font-size: 28px; touch-action: none !important; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+    .move-btn::after { content:""; position:absolute; inset:-8px; }
+    .move-btn { position:relative; }
+
+    @media (max-width: 430px) {
+      .avatar-grid { grid-template-columns: repeat(3, 1fr); }
+      .speech-bubble { width: 92%; max-height: 142px; }
+      .bubble-text { font-size: 13px; line-height: 1.38; }
+    }
+    @media (max-height: 680px) {
+      .scene.dialogue-active .character-slot { bottom: 1%; transform: translateX(-50%) scale(.68); }
+      .scene.dialogue-active .speech-bubble { max-height: 122px; }
+      .move-btn { width: 72px; height: 60px; }
+    }
+
   </style>
 </head>
 <body>
@@ -469,17 +593,17 @@
 
         <div class="field">
           <label for="playerName">Seu nome</label>
-          <input id="playerName" name="playerName" maxlength="36" placeholder="Ex.: Mariana" autocomplete="name" required>
+          <input id="playerName" name="playerName" maxlength="36" placeholder="Ex.: Mariana" autocomplete="name" autocapitalize="words" enterkeyhint="next" required>
         </div>
 
         <div class="field">
           <label for="playerSector">Seu setor</label>
-          <input id="playerSector" name="playerSector" maxlength="48" placeholder="Ex.: Atendimento" required>
+          <input id="playerSector" name="playerSector" maxlength="48" placeholder="Ex.: Atendimento" autocomplete="organization-title" autocapitalize="words" enterkeyhint="next" required>
         </div>
 
         <div class="field">
           <label for="playerUnit">Unidade <span style="font-weight:600;color:#80948e">(opcional)</span></label>
-          <input id="playerUnit" name="playerUnit" maxlength="58" placeholder="Ex.: Hospital Unimed Balneário Camboriú">
+          <input id="playerUnit" name="playerUnit" maxlength="58" placeholder="Ex.: Hospital Unimed Balneário Camboriú" autocomplete="organization" autocapitalize="words" enterkeyhint="done">
         </div>
 
         <div class="choice-title">Escolha seu personagem</div>
@@ -515,7 +639,7 @@
       <div class="decor-layer" id="decorLayer"></div>
       <div class="bubble-wrap" id="bubbleWrap">
         <div class="speech-bubble" id="speechBubble" role="button" tabindex="0" aria-label="Continuar diálogo">
-          <div class="speaker"><strong id="speakerName"></strong><span id="speakerRole"></span></div>
+          <div class="speaker"><strong id="speakerName"></strong></div>
           <p class="bubble-text" id="bubbleText"></p>
           <span class="tap-hint" id="tapHint">Toque para continuar</span>
         </div>
@@ -524,7 +648,6 @@
         <div class="character-slot player-slot" id="playerSlot"></div>
         <div class="character-slot npc-slot" id="npcSlot"></div>
       </div>
-      <div class="walk-tip hidden" id="walkTip">Use os botões para caminhar até a pessoa</div>
       <div class="movement-controls hidden" id="movementControls" aria-label="Controles de caminhada">
         <button class="move-btn" id="moveLeftBtn" type="button" aria-label="Caminhar para a esquerda">◀</button>
         <button class="move-btn" id="moveRightBtn" type="button" aria-label="Caminhar para a direita">▶</button>
@@ -584,20 +707,22 @@
   // =========================================================
 
   const PLAYER_AVATARS = [
-    { id: "lia", label: "Lia", hairStyle: "hair-long", skin: "#d89f7b", hair: "#3a2824", shirt: "#00995d", pants: "#314945" },
-    { id: "caio", label: "Caio", hairStyle: "hair-short", skin: "#bd7e58", hair: "#202825", shirt: "#00995d", pants: "#314945" },
-    { id: "bia", label: "Bia", hairStyle: "hair-curly", skin: "#865438", hair: "#251b18", shirt: "#00995d", pants: "#314945" },
-    { id: "leo", label: "Leo", hairStyle: "hair-bob", skin: "#efc09c", hair: "#7b4c35", shirt: "#00995d", pants: "#314945" }
+    { id: "avatar-1", hairStyle: "hair-curly-long", skin: "#74462f", hair: "#1f1715", shirt: "#007f58", pants: "#2f4943" },
+    { id: "avatar-2", hairStyle: "hair-bob", skin: "#d89f7b", hair: "#4a3028", shirt: "#3d71a8", pants: "#304757" },
+    { id: "avatar-3", hairStyle: "hair-long", skin: "#efc3a2", hair: "#d7aa4e", shirt: "#b98523", pants: "#4b4333" },
+    { id: "avatar-4", hairStyle: "hair-short", skin: "#bd7e58", hair: "#202825", shirt: "#325f7d", pants: "#293d49" },
+    { id: "avatar-5", hairStyle: "hair-short", skin: "#efc09c", hair: "#d6aa50", shirt: "#a85c45", pants: "#493d3a" },
+    { id: "avatar-6", hairStyle: "hair-bob", skin: "#efc09c", hair: "#7b4c35", shirt: "#7261b1", pants: "#413b59" }
   ];
 
   const NPC_LOOKS = {
-    tatiane: { hairStyle: "hair-long", skin: "#d89f7b", hair: "#4a3028", shirt: "#006b4e", pants: "#324b46" },
-    maria: { hairStyle: "hair-bob", skin: "#e0ad89", hair: "#4a2f28", shirt: "#00995d", pants: "#314945" },
-    jose: { hairStyle: "hair-short", skin: "#b97852", hair: "#2e2b29", shirt: "#5d7f9b", pants: "#344a55" },
-    joana: { hairStyle: "hair-curly", skin: "#7d4b32", hair: "#201a18", shirt: "#008f59", pants: "#314945" },
-    juliana: { hairStyle: "hair-long", skin: "#efbd98", hair: "#714733", shirt: "#3d71a8", pants: "#2e4354" },
+    mariane: { hairStyle: "hair-long", skin: "#d89f7b", hair: "#4a3028", shirt: "#006b4e", pants: "#324b46" },
+    mariaLuiza: { hairStyle: "hair-bob", skin: "#e0ad89", hair: "#4a2f28", shirt: "#00995d", pants: "#314945" },
+    daniel: { hairStyle: "hair-short", skin: "#b97852", hair: "#2e2b29", shirt: "#5d7f9b", pants: "#344a55" },
+    kamila: { hairStyle: "hair-curly", skin: "#7d4b32", hair: "#201a18", shirt: "#008f59", pants: "#314945" },
+    fernanda: { hairStyle: "hair-long", skin: "#efbd98", hair: "#714733", shirt: "#3d71a8", pants: "#2e4354" },
     sabrina: { hairStyle: "hair-bob", skin: "#c98b66", hair: "#362621", shirt: "#005d50", pants: "#2e4540" },
-    pedro: { hairStyle: "hair-short", skin: "#d39b72", hair: "#32241f", shirt: "#b86e50", pants: "#4b403c" },
+    vanessa: { hairStyle: "hair-long", skin: "#d39b72", hair: "#32241f", shirt: "#b86e50", pants: "#4b403c" },
     julia: { hairStyle: "hair-long", skin: "#e5ae87", hair: "#5c382b", shirt: "#d5773f", pants: "#51423a" },
     marcelo: { hairStyle: "hair-curly", skin: "#9d6343", hair: "#241b18", shirt: "#7261b1", pants: "#443c62" },
     jhonatan: { hairStyle: "hair-short", skin: "#b97755", hair: "#28231f", shirt: "#006b4e", pants: "#303f3b" }
@@ -608,8 +733,8 @@
     room: "Boas-vindas",
     area: "Introdução da missão",
     role: "Gestora da Experiência",
-    name: "Tatiane",
-    look: "tatiane",
+    name: "Mariane",
+    look: "mariane",
     theme: { bg: "#dff1e8", wall: "#e7f5ee" },
     decor: "reception",
     lines: [
@@ -623,7 +748,7 @@
 
   const QUESTIONS = [
     {
-      room: "Recepção", area: "Sala 1", name: "Maria Clara", role: "Recepcionista", look: "maria",
+      room: "Recepção", area: "Sala 1", name: "Maria Luiza", role: "Recepcionista", look: "mariaLuiza",
       theme: { bg: "#e4f4ec", wall: "#edf8f2" }, decor: "reception",
       question: "Oi, {nome}! Uma paciente acabou de sair, mas não respondeu à pesquisa que enviamos.\n\nÀs vezes, as pessoas pensam que o NPS serve apenas para descobrirmos se o atendimento foi bom ou ruim.\n\nNa sua opinião, qual é a principal importância dessa pesquisa?",
       options: [
@@ -636,7 +761,7 @@
       transition: "Seguindo para a sala de espera"
     },
     {
-      room: "Sala de Espera", area: "Sala 2", name: "José", role: "Paciente", look: "jose",
+      room: "Sala de Espera", area: "Sala 2", name: "Daniel", role: "Paciente", look: "daniel",
       theme: { bg: "#dff3f1", wall: "#e9f7f5" }, decor: "waiting",
       question: "Eu acabei de ser atendido aqui e dei nota 8 para o atendimento.\n\nNão tive nenhum problema grave, mas também não aconteceu nada que realmente me surpreendesse.\n\nComo você acredita que minha resposta deve ser interpretada?",
       options: [
@@ -649,7 +774,7 @@
       transition: "Chegando ao posto assistencial"
     },
     {
-      room: "Posto Assistencial", area: "Sala 3", name: "Joana", role: "Enfermeira", look: "joana",
+      room: "Posto Assistencial", area: "Sala 3", name: "Kamila", role: "Enfermeira", look: "kamila",
       theme: { bg: "#dff2e5", wall: "#eaf7ee" }, decor: "care",
       question: "Recebemos uma nota 4 de um paciente.\n\nO comentário diz apenas: “Meu atendimento demorou muito e ninguém me explicou o motivo.”\n\nO que devemos fazer agora?",
       options: [
@@ -662,7 +787,7 @@
       transition: "Analisando os indicadores"
     },
     {
-      room: "Sala de Indicadores", area: "Sala 4", name: "Juliana", role: "Analista de Dados", look: "juliana",
+      room: "Sala de Indicadores", area: "Sala 4", name: "Fernanda", role: "Analista de Dados", look: "fernanda",
       theme: { bg: "#e5edf8", wall: "#eef3fb" }, decor: "indicators",
       question: "Nosso NPS aumentou neste mês.\n\nMas, ao analisar os comentários, percebemos que várias pessoas continuam reclamando do mesmo problema.\n\nQual interpretação é mais adequada?",
       options: [
@@ -688,7 +813,7 @@
       transition: "Mobilizando as equipes"
     },
     {
-      room: "Central de Comunicação", area: "Sala 6", name: "Pedro", role: "Analista de Comunicação", look: "pedro",
+      room: "Central de Comunicação", area: "Sala 6", name: "Vanessa", role: "Analista de Comunicação", look: "vanessa",
       theme: { bg: "#f3e5de", wall: "#faeee7" }, decor: "communication",
       question: "Precisamos continuar com o envio do NPS aos clientes mesmo depois da Copa NPS terminar?",
       options: [
@@ -779,7 +904,6 @@
   const bubbleWrap = $("bubbleWrap");
   const speechBubble = $("speechBubble");
   const speakerName = $("speakerName");
-  const speakerRole = $("speakerRole");
   const bubbleText = $("bubbleText");
   const tapHint = $("tapHint");
   const playerSlot = $("playerSlot");
@@ -789,7 +913,6 @@
   const panelTitle = $("panelTitle");
   const decisionPanel = $("decisionPanel");
   const movementControls = $("movementControls");
-  const walkTip = $("walkTip");
   const moveLeftBtn = $("moveLeftBtn");
   const moveRightBtn = $("moveRightBtn");
 
@@ -838,16 +961,15 @@
         <div class="leg left"></div><div class="leg right"></div><div class="shoe left"></div><div class="shoe right"></div>
       </div>
       <div class="character-shadow"></div>
-      <div class="char-name-tag">${isPlayer ? state.player.name : label}</div>`;
+      ${(isPlayer ? state.player.name : label) ? `<div class="char-name-tag">${isPlayer ? state.player.name : label}</div>` : ""}`;
   }
 
   function renderAvatarPicker() {
     $("avatarGrid").innerHTML = PLAYER_AVATARS.map((avatar, index) => `
       <div class="avatar-option">
         <input type="radio" id="avatar-${avatar.id}" name="avatar" value="${avatar.id}" ${index === 0 ? "checked" : ""}>
-        <label for="avatar-${avatar.id}">
-          <div class="mini-avatar">${characterHTML(avatar, avatar.label)}</div>
-          <span class="avatar-label">${avatar.label}</span>
+        <label for="avatar-${avatar.id}" aria-label="Personagem ${index + 1}">
+          <div class="mini-avatar">${characterHTML(avatar, "")}</div>
         </label>
       </div>`).join("");
   }
@@ -862,20 +984,21 @@
   function renderDecor(kind) {
     const plant = `<div class="plant"><i class="leaf"></i><i class="leaf"></i><i class="leaf"></i></div>`;
     const map = {
-      reception: `${plant}<div class="window"></div><div class="desk-prop"></div>`,
-      waiting: `${plant}<div class="window"></div><div class="bench"></div>`,
-      care: `${plant}<div class="monitor-wall"></div><div class="desk-prop"></div>`,
-      indicators: `${plant}<div class="chart-board"><span></span><span></span><span></span><span></span></div>`,
-      management: `${plant}<div class="chart-board"><span></span><span></span><span></span><span></span></div><div class="desk-prop"></div>`,
-      communication: `${plant}<div class="speech-cards"><i></i><i></i><i></i></div>`,
-      relationship: `${plant}<div class="speech-cards"><i></i><i></i><i></i></div><div class="bench"></div>`,
-      ideas: `${plant}<div class="idea-board"></div>`,
-      arena: `${plant}<div class="trophy"></div><div class="chart-board" style="left:16px;right:auto;transform:scale(.72)"><span></span><span></span><span></span><span></span></div>`
+      reception: `${plant}<div class="wall-sign">RECEPÇÃO</div><div class="queue-display">A-102</div><div class="reception-counter"></div>`,
+      waiting: `<div class="window"></div><div class="magazine-rack"></div><div class="chair-row"><i></i><i></i><i></i></div>${plant}`,
+      care: `<div class="iv-stand"></div><div class="care-cabinet"></div><div class="monitor-wall" style="left:88px;right:auto;transform:scale(.72)"></div>`,
+      indicators: `<div class="dashboard-wall"><i></i><i></i><i></i><i></i></div>${plant}`,
+      management: `<div class="strategy-board"></div><div class="meeting-table"></div>${plant}`,
+      communication: `<div class="campaign-board"></div><div class="megaphone"></div>${plant}`,
+      relationship: `<div class="service-counter"></div><div class="rating-kiosk"></div>${plant}`,
+      ideas: `<div class="sticky-wall"><i></i><i></i><i></i><i></i></div><div class="idea-bulb">💡</div>${plant}`,
+      arena: `<div class="spotlight left"></div><div class="spotlight right"></div><div class="confetti"></div><div class="trophy" style="left:50%;right:auto;transform:translateX(-50%) scale(.82)"></div><div class="podium"></div>`
     };
     decorLayer.innerHTML = map[kind] || map.reception;
   }
 
   function applySceneVisuals(data) {
+    sceneEl.dataset.room = data.decor || "reception";
     sceneEl.style.setProperty("--room-bg", data.theme.bg);
     sceneEl.style.setProperty("--wall", data.theme.wall);
     $("hudRoomName").textContent = data.room;
@@ -894,11 +1017,6 @@
     moveLeftBtn.classList.toggle("pressed", state.moveDirection < 0);
     moveRightBtn.classList.toggle("pressed", state.moveDirection > 0);
 
-    const distance = Math.abs(state.npcPosition - state.playerPosition);
-    walkTip.classList.toggle("near", distance < 24);
-    if (state.movementEnabled) {
-      walkTip.textContent = distance < 24 ? `Você está chegando perto de ${getCurrentEncounter().name}` : `Caminhe até ${getCurrentEncounter().name}`;
-    }
   }
 
   function getCurrentEncounter() {
@@ -916,12 +1034,11 @@
 
     playerSlot.classList.remove("walking", "facing-left");
     bubbleWrap.classList.add("hidden");
+    sceneEl.classList.remove("dialogue-active");
     movementControls.classList.remove("hidden");
-    walkTip.classList.remove("hidden", "near");
     decisionPanel.classList.add("walk-mode");
     optionsEl.innerHTML = "";
     continueBtn.classList.add("hidden");
-    panelTitle.textContent = `Caminhe até ${data.name}`;
     updatePlayerPosition();
   }
 
@@ -932,8 +1049,8 @@
     state.moveDirection = 0;
     updatePlayerPosition();
     movementControls.classList.add("hidden");
-    walkTip.classList.add("hidden");
     decisionPanel.classList.remove("walk-mode");
+    sceneEl.classList.add("dialogue-active");
     bubbleWrap.classList.remove("hidden");
     tone(620, .06);
 
@@ -958,10 +1075,9 @@
     requestAnimationFrame(movementLoop);
   }
 
-  function setBubble(name, role, text, playerSpeaking = false, showHint = false) {
+  function setBubble(name, _role, text, playerSpeaking = false, showHint = false) {
     bubbleWrap.classList.toggle("player-speaking", playerSpeaking);
     speakerName.textContent = name;
-    speakerRole.textContent = role;
     bubbleText.textContent = interpolate(text);
     tapHint.classList.toggle("hidden", !showHint);
     speechBubble.animate([{ opacity: .2, transform: "translateY(7px) scale(.98)" }, { opacity: 1, transform: "none" }], { duration: 260, easing: "ease-out" });
@@ -997,7 +1113,7 @@
   }
 
   function showIntroLine() {
-    panelTitle.textContent = "Converse com Tatiane";
+    panelTitle.textContent = `Converse com ${INTRO_SCENE.name}`;
     setBubble(INTRO_SCENE.name, INTRO_SCENE.role, INTRO_SCENE.lines[state.introLine], false, true);
   }
 
@@ -1054,6 +1170,7 @@
       setTimeout(() => tone(980, .14, "sine", .045), 90);
       setBubble(data.name, data.role, data.correctFeedback, false, false);
       npcSlot.querySelector(".character")?.classList.add("react-good");
+      playerSlot.querySelector(".character")?.classList.add("react-good");
       panelTitle.textContent = `Boa decisão · +${(1000 + speedBonus + streakBonus).toLocaleString("pt-BR")} pontos`;
     } else {
       state.streak = 0;
@@ -1208,21 +1325,51 @@
     }
   }
   function bindMoveButton(button, direction) {
-    const start = (event) => { event.preventDefault(); setMoveDirection(direction); };
-    const stop = (event) => { event.preventDefault(); stopMove(direction); };
-    button.addEventListener("pointerdown", start);
-    button.addEventListener("pointerup", stop);
-    button.addEventListener("pointercancel", stop);
-    button.addEventListener("pointerleave", stop);
+    let activePointerId = null;
+
+    const start = (event) => {
+      if (!state.movementEnabled) return;
+      event.preventDefault();
+      event.stopPropagation();
+      activePointerId = event.pointerId;
+      try { button.setPointerCapture?.(event.pointerId); } catch (_) {}
+      setMoveDirection(direction);
+    };
+
+    const stop = (event) => {
+      if (activePointerId === null) return;
+      if (event?.pointerId != null && event.pointerId !== activePointerId) return;
+      event?.preventDefault?.();
+      try { button.releasePointerCapture?.(activePointerId); } catch (_) {}
+      activePointerId = null;
+      stopMove(direction);
+    };
+
+    button.addEventListener("pointerdown", start, { passive: false });
+    button.addEventListener("pointerup", stop, { passive: false });
+    button.addEventListener("pointercancel", stop, { passive: false });
+    button.addEventListener("lostpointercapture", stop);
+    button.addEventListener("contextmenu", event => event.preventDefault());
+    window.addEventListener("pointerup", stop, { passive: false, capture: true });
+    window.addEventListener("pointercancel", stop, { passive: false, capture: true });
   }
   bindMoveButton(moveLeftBtn, -1);
   bindMoveButton(moveRightBtn, 1);
+
+  function isTypingTarget(target) {
+    return target instanceof HTMLElement && (
+      target.matches("input, textarea, select") || target.isContentEditable
+    );
+  }
+
   window.addEventListener("keydown", (event) => {
+    if (isTypingTarget(event.target)) return;
     if (["ArrowLeft", "ArrowRight", "a", "A", "d", "D"].includes(event.key)) event.preventDefault();
     if (event.key === "ArrowLeft" || event.key === "a" || event.key === "A") setMoveDirection(-1);
     if (event.key === "ArrowRight" || event.key === "d" || event.key === "D") setMoveDirection(1);
   }, { passive: false });
   window.addEventListener("keyup", (event) => {
+    if (isTypingTarget(event.target)) return;
     if (["ArrowLeft", "a", "A"].includes(event.key)) stopMove(-1);
     if (["ArrowRight", "d", "D"].includes(event.key)) stopMove(1);
   });
