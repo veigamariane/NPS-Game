@@ -589,6 +589,204 @@
       .move-btn { width: 76px; height: 62px; }
     }
 
+
+
+    /* V9: correções de largura e viewport para Safari/iPhone */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    body {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    .app,
+    .game-screen,
+    .hud,
+    .scene,
+    .decision-panel {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    .game-screen {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hud-top {
+      min-width: 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 7px;
+    }
+    .hud-brand,
+    .hud-room,
+    .score-box,
+    .lives {
+      min-width: 0;
+    }
+    .hud-brand img {
+      flex: 0 1 auto;
+      width: clamp(78px, 24vw, 108px);
+      max-width: 108px;
+    }
+    .hud-room strong,
+    .hud-room span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .score-box,
+    .lives {
+      flex-shrink: 0;
+    }
+
+    .bubble-wrap {
+      left: 10px;
+      right: 10px;
+      width: auto;
+      max-width: none;
+      min-width: 0;
+    }
+    .speech-bubble {
+      width: 100%;
+      max-width: 470px;
+      min-width: 0;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    .bubble-text,
+    .speaker,
+    .speaker strong {
+      min-width: 0;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+
+    .decision-panel {
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      scrollbar-gutter: stable;
+    }
+    .options {
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
+    }
+    .option-btn {
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr);
+      align-items: center;
+      column-gap: 9px;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      padding: 11px 12px;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+    .option-letter {
+      position: static;
+      left: auto;
+      top: auto;
+      transform: none;
+      flex: none;
+    }
+    .option-text {
+      min-width: 0;
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+
+    @media (max-width: 699px) {
+      .app {
+        width: min(100vw, var(--visible-width, 100vw));
+        height: var(--visible-height, 100dvh);
+        min-height: 0;
+        max-width: 100vw;
+        max-height: var(--visible-height, 100dvh);
+      }
+      .game-screen,
+      .start-screen,
+      .result-screen {
+        height: 100%;
+        max-height: 100%;
+      }
+      .hud {
+        padding-left: 9px;
+        padding-right: 9px;
+      }
+      .hud-brand {
+        gap: 6px;
+      }
+      .score-box {
+        padding: 7px 8px;
+        font-size: 11px;
+      }
+      .lives {
+        gap: 1px;
+      }
+      .heart {
+        width: 16px;
+        height: 16px;
+      }
+      .decision-panel {
+        max-height: min(47svh, 47dvh);
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: calc(14px + var(--safe-bottom));
+      }
+      .option-btn {
+        font-size: 12px;
+        line-height: 1.32;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .hud-brand img {
+        width: 76px;
+      }
+      .hud-room span {
+        display: none;
+      }
+      .hud-room strong {
+        font-size: 11px;
+      }
+      .score-box {
+        padding: 6px 7px;
+        font-size: 10.5px;
+      }
+      .heart {
+        width: 15px;
+        height: 15px;
+      }
+      .bubble-wrap {
+        left: 8px;
+        right: 8px;
+      }
+      .decision-panel {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      .option-btn {
+        grid-template-columns: 22px minmax(0, 1fr);
+        column-gap: 8px;
+        padding: 10px;
+        font-size: 11.5px;
+      }
+      .option-letter {
+        width: 22px;
+        height: 22px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -913,8 +1111,24 @@
     movementEnabled: false,
     encounterStarted: false,
     currentEncounterIsIntro: false,
-    lastFrameTime: 0
+    lastFrameTime: 0,
+    endedByLives: false
   };
+
+
+  function syncVisibleViewport() {
+    const viewport = window.visualViewport;
+    const width = Math.floor(viewport?.width || window.innerWidth || document.documentElement.clientWidth);
+    const height = Math.floor(viewport?.height || window.innerHeight || document.documentElement.clientHeight);
+    document.documentElement.style.setProperty("--visible-width", `${width}px`);
+    document.documentElement.style.setProperty("--visible-height", `${height}px`);
+  }
+
+  syncVisibleViewport();
+  window.addEventListener("resize", syncVisibleViewport, { passive: true });
+  window.addEventListener("orientationchange", () => setTimeout(syncVisibleViewport, 120), { passive: true });
+  window.visualViewport?.addEventListener("resize", syncVisibleViewport, { passive: true });
+  window.visualViewport?.addEventListener("scroll", syncVisibleViewport, { passive: true });
 
   const $ = (id) => document.getElementById(id);
   const startScreen = $("startScreen");
@@ -1134,6 +1348,7 @@
     state.score = 0;
     state.streak = 0;
     state.answered = false;
+    state.endedByLives = false;
     state.startedAt = Date.now();
     updateHUD();
     renderIntro();
@@ -1181,7 +1396,8 @@
     continueBtn.classList.add("hidden");
     optionsEl.innerHTML = data.options.map((option, optionIndex) => `
       <button class="option-btn" type="button" data-option="${optionIndex}">
-        <span class="option-letter">${String.fromCharCode(65 + optionIndex)}</span>${option}
+        <span class="option-letter">${String.fromCharCode(65 + optionIndex)}</span>
+        <span class="option-text">${option}</span>
       </button>`).join("");
     optionsEl.querySelectorAll(".option-btn").forEach(btn => btn.addEventListener("click", () => answerQuestion(Number(btn.dataset.option))));
   }
@@ -1224,7 +1440,12 @@
       else btn.classList.add("dim");
     });
 
-    continueBtn.textContent = state.sceneIndex === QUESTIONS.length - 1 ? "Ver meu resultado" : "Continuar para a próxima sala";
+    if (state.lives <= 0) {
+      state.endedByLives = true;
+      continueBtn.textContent = "Ver resultado e tentar novamente";
+    } else {
+      continueBtn.textContent = state.sceneIndex === QUESTIONS.length - 1 ? "Ver meu resultado" : "Continuar para a próxima sala";
+    }
     continueBtn.classList.remove("hidden");
     updateHUD();
   }
@@ -1249,6 +1470,10 @@
     }
     if (!state.answered) return;
     const current = QUESTIONS[state.sceneIndex];
+    if (state.lives <= 0) {
+      transitionTo("Encerrando a missão", () => finishGame(true));
+      return;
+    }
     if (state.sceneIndex >= QUESTIONS.length - 1) {
       transitionTo(current.transition, finishGame);
       return;
@@ -1266,16 +1491,27 @@
     return `${min}:${sec}`;
   }
 
-  function finishGame() {
+  function finishGame(endedByLives = false) {
     const elapsed = Date.now() - state.startedAt;
-    const completionBonus = 2000;
-    const livesBonus = state.lives * 500;
-    state.score += completionBonus + livesBonus;
+    state.endedByLives = endedByLives;
+
+    if (!endedByLives) {
+      const completionBonus = 2000;
+      const livesBonus = state.lives * 500;
+      state.score += completionBonus + livesBonus;
+    }
+
     gameScreen.classList.add("hidden");
     resultScreen.classList.remove("hidden");
 
     let title, text, medal, icon;
-    if (state.correct >= 8) {
+    if (endedByLives) {
+      const answeredCount = Math.max(1, state.sceneIndex + 1);
+      title = "Seus corações acabaram";
+      text = `${state.player.name}, a missão foi encerrada após ${answeredCount} ${answeredCount === 1 ? "decisão" : "decisões"}. Você pode começar novamente e usar o que aprendeu para avançar ainda mais.`;
+      medal = "Aprendiz da Experiência";
+      icon = "💚";
+    } else if (state.correct >= 8) {
       title = "Missão concluída com excelência!";
       text = `Parabéns, ${state.player.name}! Você demonstrou que entende como transformar resultados de NPS em decisões, ações e experiências melhores.`;
       medal = "Guardião da Experiência"; icon = "🏆";
@@ -1297,8 +1533,22 @@
     $("resultScore").textContent = state.score.toLocaleString("pt-BR");
     $("resultTime").textContent = formatTime(elapsed);
     $("resultLives").textContent = state.lives;
-    $("playerSummary").innerHTML = `<strong>${state.player.name}</strong> · ${state.player.sector}${state.player.unit ? `<br>${state.player.unit}` : ""}<br><span style="color:#789089">A pontuação inclui bônus de conclusão, rapidez, sequência e vidas restantes.</span>`;
-    tone(660, .12, "sine", .05); setTimeout(() => tone(880, .16, "sine", .05), 120); setTimeout(() => tone(1100, .2, "sine", .04), 260);
+    $("restartBtn").textContent = endedByLives ? "Iniciar novamente" : "Jogar novamente";
+    $("shareBtn").classList.toggle("hidden", endedByLives);
+
+    const scoreNote = endedByLives
+      ? "A pontuação considera apenas as etapas realizadas antes do encerramento."
+      : "A pontuação inclui bônus de conclusão, rapidez, sequência e vidas restantes.";
+    $("playerSummary").innerHTML = `<strong>${state.player.name}</strong> · ${state.player.sector}${state.player.unit ? `<br>${state.player.unit}` : ""}<br><span style="color:#789089">${scoreNote}</span>`;
+
+    if (endedByLives) {
+      tone(260, .16, "sine", .04);
+      setTimeout(() => tone(210, .22, "sine", .035), 140);
+    } else {
+      tone(660, .12, "sine", .05);
+      setTimeout(() => tone(880, .16, "sine", .05), 120);
+      setTimeout(() => tone(1100, .2, "sine", .04), 260);
+    }
   }
 
   function shareResult() {
@@ -1319,6 +1569,8 @@
     resultScreen.classList.add("hidden");
     gameScreen.classList.add("hidden");
     startScreen.classList.remove("hidden");
+    $("shareBtn").classList.remove("hidden");
+    $("restartBtn").textContent = "Jogar novamente";
     $("playerForm").scrollIntoView({ block: "start" });
   }
 
